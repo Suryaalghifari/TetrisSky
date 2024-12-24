@@ -14,7 +14,7 @@ def start_screen(screen, font):
         title_text = font.render("Genjor Tetris", True, (255, 255, 255))
         screen.blit(title_text, (75, 150))
 
-        # Tangani event
+        # event
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -37,6 +37,41 @@ def start_screen(screen, font):
 
         pygame.display.flip()
 
+# Logic Tampilan Game Over
+def game_over_screen(screen, font, score):
+    running = True
+    button_color= (200, 0, 0)
+    button_hover_color = (255, 0, 0)
+    button_rect = pygame.Rect(100, 250, 100, 50)
+    
+    while running:
+        screen.fill((0, 0, 0))
+        game_over_text = font.render("GAME OVER", True, (255, 255, 255))
+        score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+        screen.blit(game_over_text, (75, 150))
+        screen.blit(score_text, (100, 200))
+    
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_rect.collidepoint(event.pos):
+                    return
+                
+        mouse_pos = pygame.mouse.get_pos()
+        color = button_hover_color if button_rect.collidepoint(mouse_pos) else button_color
+        
+        pygame.draw.rect(screen, color, button_rect)
+        button_text = font.render("Restart", True, (0, 0 , 0))
+        screen.blit(button_text, (button_rect.x + 10, button_rect.y +10))
+
+        pygame.display.flip()
+        
+
+
+
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((300, 600))
@@ -55,7 +90,7 @@ def main():
     next_tetrimino = Tetrimino(columns // 2 - 1, 0, random.choice(shapes))
 
     fall_time = 0
-    fall_speed = 0.5
+    fall_speed = 0.1
     running = True
     score = 0
     lines_cleared = 0
@@ -122,6 +157,11 @@ def main():
                     base_score = 100
                     bonus = (lines - 1) * 50
                     score += lines * base_score + bonus
+                
+                # Manggil Tampilan Awal After Game Over
+                if any(grid[0]):
+                    game_over_screen(screen, font, score)
+                    return
 
         # Rendering
         screen.fill(colors[0])
@@ -144,4 +184,5 @@ def main():
     pygame.quit()
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
